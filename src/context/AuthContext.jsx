@@ -3,6 +3,7 @@ import { auth } from '../firebase';
 import {
     GoogleAuthProvider,
     signInWithRedirect,
+    signInWithPopup,
     getRedirectResult,
     signOut,
     onAuthStateChanged
@@ -17,10 +18,18 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const login = () => {
+    const loginWithRedirect = () => {
+        setError('');
         const provider = new GoogleAuthProvider();
         return signInWithRedirect(auth, provider);
+    };
+
+    const loginWithPopup = () => {
+        setError('');
+        const provider = new GoogleAuthProvider();
+        return signInWithPopup(auth, provider);
     };
 
     const logout = () => {
@@ -33,12 +42,17 @@ export const AuthProvider = ({ children }) => {
                 await getRedirectResult(auth);
             } catch (error) {
                 console.error("Redirect login error:", error);
+                setError(error.message);
             }
         };
         handleRedirect();
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
+            setLoading(false);
+        }, (error) => {
+            console.error("Auth state error:", error);
+            setError(error.message);
             setLoading(false);
         });
 
@@ -47,8 +61,10 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         currentUser,
-        login,
-        logout
+        loginWithRedirect,
+        loginWithPopup,
+        logout,
+        error
     };
 
     return (

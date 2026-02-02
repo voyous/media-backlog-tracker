@@ -4,7 +4,7 @@ import { Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 
 const Login = () => {
-    const { login, currentUser } = useAuth();
+    const { loginWithRedirect, loginWithPopup, currentUser, error } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,9 +13,17 @@ const Login = () => {
         }
     }, [currentUser, navigate]);
 
-    const handleLogin = async () => {
+    const handleLoginRedirect = async () => {
         try {
-            await login();
+            await loginWithRedirect();
+        } catch (error) {
+            console.error("Failed to log in", error);
+        }
+    };
+
+    const handleLoginPopup = async () => {
+        try {
+            await loginWithPopup();
         } catch (error) {
             console.error("Failed to log in", error);
         }
@@ -30,13 +38,26 @@ const Login = () => {
                 <h1 className="text-gradient">Media Tracker</h1>
                 <p className="subtitle">Track your games, movies, and shows across all your devices.</p>
 
-                <button onClick={handleLogin} className="google-btn">
-                    <img
-                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                        alt="Google logo"
-                    />
-                    <span>Sign in with Google</span>
-                </button>
+                {error && <div className="error-message">{error}</div>}
+
+                <div className="button-group">
+                    <button onClick={handleLoginRedirect} className="google-btn">
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google logo"
+                        />
+                        <span>Sign in (Redirect)</span>
+                    </button>
+
+                    <button onClick={handleLoginPopup} className="google-btn secondary">
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google logo"
+                        />
+                        <span>Sign in (Popup)</span>
+                    </button>
+                    <p className="helper-text">Try Popup if Redirect fails on your device.</p>
+                </div>
             </div>
 
             <style>{`
@@ -69,6 +90,19 @@ const Login = () => {
                     color: var(--text-secondary);
                     margin-bottom: 2.5rem;
                     font-size: 1.1rem;
+                .error-message {
+                    background: rgba(239, 68, 68, 0.2);
+                    color: #fca5a5;
+                    padding: 0.75rem;
+                    border-radius: var(--radius-sm);
+                    margin-bottom: 1.5rem;
+                    font-size: 0.9rem;
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                }
+                .button-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
                 }
                 .google-btn {
                     display: flex;
@@ -83,6 +117,12 @@ const Login = () => {
                     font-weight: 500;
                     font-family: 'Roboto', sans-serif;
                     transition: transform 0.2s ease;
+                    cursor: pointer;
+                    border: none;
+                }
+                .google-btn.secondary {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: white;
                 }
                 .google-btn:hover {
                     transform: translateY(-2px);
@@ -91,6 +131,11 @@ const Login = () => {
                 .google-btn img {
                     width: 24px;
                     height: 24px;
+                }
+                .helper-text {
+                    font-size: 0.8rem;
+                    color: var(--text-secondary);
+                    margin-top: 0.5rem;
                 }
             `}</style>
         </div>
