@@ -6,7 +6,7 @@ const Sidebar = () => {
   const { currentUser, logout } = useAuth();
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/games', label: 'Games', icon: Gamepad2 },
     { path: '/movies', label: 'Movies', icon: Film },
     { path: '/tv', label: 'TV Shows', icon: Tv },
@@ -17,7 +17,7 @@ const Sidebar = () => {
   return (
     <aside className="sidebar glass-panel">
       <div className="logo-container">
-        <h1 className="logo-text text-gradient">Backlog</h1>
+        <h1 className="logo-text text-gradient">Unstack</h1>
       </div>
 
       <nav className="nav-menu">
