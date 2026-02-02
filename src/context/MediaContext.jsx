@@ -1,46 +1,80 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { useAuth } from './AuthContext';
+import {
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy
+} from 'firebase/firestore';
 
 const MediaContext = createContext();
 
-const STORAGE_KEY = 'media_backlog_data';
-
 export const MediaProvider = ({ children }) => {
-    const [items, setItems] = useState(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : [];
-    });
+    const { currentUser } = useAuth();
+    const [items, setItems] = useState([]);
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }, [items]);
-
-    // Helper for non-secure contexts (HTTP on mobile)
-    const generateId = () => {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
+        if (!currentUser) {
+            setItems([]);
+            return;
         }
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+
+        const itemsRef = collection(db, 'users', currentUser.uid, 'items');
+        const q = query(itemsRef, orderBy('addedAt', 'desc'));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetchedItems = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setItems(fetchedItems);
+        });
+
+        return unsubscribe;
+    }, [currentUser]);
+
+    const addItem = async (item) => {
+        if (!currentUser) return;
+
+        try {
+            await addDoc(collection(db, 'users', currentUser.uid, 'items'), {
+                addedAt: new Date().toISOString(),
+                status: 'backlog',
+                rating: 0,
+                image: '',
+                notes: '',
+                ...item
+            });
+        } catch (error) {
+            console.error("Error adding item:", error);
+        }
     };
 
-    const addItem = (item) => {
-        const newItem = {
-            id: generateId(),
-            addedAt: new Date().toISOString(),
-            status: 'backlog',
-            rating: 0,
-            image: '',
-            notes: '',
-            ...item
-        };
-        setItems((prev) => [newItem, ...prev]);
+    const updateItem = async (id, updates) => {
+        if (!currentUser) return;
+
+        try {
+            const itemRef = doc(db, 'users', currentUser.uid, 'items', id);
+            await updateDoc(itemRef, updates);
+        } catch (error) {
+            console.error("Error updating item:", error);
+        }
     };
 
-    const updateItem = (id, updates) => {
-        setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
-    };
+    const deleteItem = async (id) => {
+        if (!currentUser) return;
 
-    const deleteItem = (id) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+        try {
+            const itemRef = doc(db, 'users', currentUser.uid, 'items', id);
+            await deleteDoc(itemRef);
+        } catch (error) {
+            console.error("Error deleting item:", error);
+        }
     };
 
     const getStats = () => {
