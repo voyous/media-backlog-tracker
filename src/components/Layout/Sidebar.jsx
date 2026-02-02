@@ -17,7 +17,7 @@ const Sidebar = () => {
   return (
     <aside className="sidebar glass-panel">
       <div className="logo-container">
-        <h1 className="logo-text text-gradient">Unstack</h1>
+        <h1 className="logo-text text-gradient">Unstackd</h1>
       </div>
 
       <nav className="nav-menu">

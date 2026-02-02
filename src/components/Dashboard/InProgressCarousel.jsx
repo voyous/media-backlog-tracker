@@ -44,6 +44,12 @@ const InProgressCarousel = () => {
                         className="carousel-item glass-panel"
                         onClick={() => setSelectedItem(item)}
                     >
+                        {item.coverUrl && (
+                            <div className="carousel-cover">
+                                <img src={item.coverUrl} alt={item.title} loading="lazy" />
+                                <div className="cover-overlay"></div>
+                            </div>
+                        )}
                         <div className="item-content">
                             <span className="category-tag">{item.category}</span>
                             <h3 className="item-title">{item.title}</h3>
@@ -132,16 +138,29 @@ const InProgressCarousel = () => {
                 .carousel-item {
                     flex: 0 0 260px;
                     scroll-snap-align: start;
-                    padding: 1.25rem;
                     cursor: pointer;
                     transition: transform 0.2s ease, border-color 0.2s ease;
                     min-height: 140px;
                     display: flex;
                     flex-direction: column;
+                    padding: 0; /* Remove padding to let image flush */
+                    overflow: hidden; /* For image corners */
                 }
                 .carousel-item:hover {
                     transform: translateY(-4px);
                     border-color: var(--accent-primary);
+                }
+                
+                .carousel-cover {
+                    height: 120px;
+                    width: 100%;
+                    position: relative;
+                    background: #111;
+                }
+                .carousel-cover img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                 }
 
                 .item-content {
@@ -149,6 +168,7 @@ const InProgressCarousel = () => {
                     flex-direction: column;
                     height: 100%;
                     gap: 0.5rem;
+                    padding: 1rem;
                 }
 
                 .category-tag {

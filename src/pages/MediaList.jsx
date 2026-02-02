@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMedia } from '../context/MediaContext';
 import AddMediaModal from '../components/Media/AddMediaModal';
 import MediaDetailsModal from '../components/Media/MediaDetailsModal'; // Import
-import { Trash2 } from 'lucide-react';
+import { Trash2, Image as ImageIcon } from 'lucide-react';
 
 const getRatingColor = (rating) => {
   const score = parseFloat(rating);
@@ -74,8 +74,6 @@ const MediaList = ({ title, category }) => {
     .sort((a, b) => {
       if (sortBy === 'letterboxd_high_low') return (parseFloat(b.letterboxdRating) || 0) - (parseFloat(a.letterboxdRating) || 0);
       if (sortBy === 'letterboxd_low_high') return (parseFloat(a.letterboxdRating) || 0) - (parseFloat(b.letterboxdRating) || 0);
-      if (sortBy === 'excited_high_low') return (items.excitement || 0) - (items.excitement || 0); // Wait, variable name error here? Yes.
-      // Correction: (b.excitement || 0) - (a.excitement || 0)
       if (sortBy === 'excited_high_low') return (b.excitement || 0) - (a.excitement || 0);
       if (sortBy === 'personal_high_low') return (parseFloat(b.personalRating) || 0) - (parseFloat(a.personalRating) || 0);
       if (sortBy === 'personal_low_high') return (parseFloat(a.personalRating) || 0) - (parseFloat(b.personalRating) || 0);
@@ -136,11 +134,28 @@ const MediaList = ({ title, category }) => {
           </span>
         );
       case 'music':
-        return <span className="item-meta">{item.artist}</span>;
+        return (
+          <span className="item-meta">
+            {item.year && <span>{item.year} • </span>}
+            {item.artist}
+          </span>
+        );
       case 'book':
-        return item.author && <span className="item-meta">{item.author}</span>;
+        return (
+          <span className="item-meta">
+            {item.year && <span>{item.year}</span>}
+            {item.author && <span>{item.year ? ' • ' : ''}{item.author}</span>}
+          </span>
+        );
       case 'tv':
-        return <span className="item-meta">{{ short: 'Mini Series', medium: 'Standard Season', long: 'Long Running' }[item.showLength] || item.showLength} • {item.seasonType === 'specific' ? `Season ${item.seasonNumber}` : 'Entire Show'}</span>;
+        return <span className="item-meta">{item.seasonType === 'specific' ? `Season ${item.seasonNumber}` : 'Entire Show'}</span>;
+      case 'game':
+        return (
+          <span className="item-meta">
+            {item.year && <span>{item.year}</span>}
+            {item.genre && <span>{item.year ? ' • ' : ''}{item.genre.split(',')[0]}</span>}
+          </span>
+        );
       default:
         return item.genre && <span className="item-meta">{item.genre}</span>;
     }
@@ -263,22 +278,110 @@ const MediaList = ({ title, category }) => {
               className={`media-card glass-panel ${filterStatus === 'all' ? `status-${item.status}-card` : ''}`}
               onClick={() => handleItemClick(item)}
             >
+              {/* DELETE BUTTON - Always visible */}
+              {/* DELETE BUTTON - Always visible */}
               <button
                 className="delete-btn"
-                onClick={(e) => handleDelete(e, item.id)}
-                title="Delete item"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm('Delete this item?')) {
+                    deleteItem(item.id);
+                  }
+                }}
+                title="Delete Item"
+                style={{
+                  position: 'absolute',
+                  top: '0.5rem',
+                  right: '0.5rem',
+                  zIndex: 10,
+                  background: 'rgba(0,0,0,0.6)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#fff',
+                  opacity: 0, // Hidden by default, shown on hover via CSS
+                  transition: 'opacity 0.2s'
+                }}
               >
-                <Trash2 size={16} />
+                <Trash2 size={14} />
               </button>
+
+              {/* Poster / Cover Image */}
+              {item.coverUrl ? (
+                <div className="card-cover">
+                  <img src={item.coverUrl} alt={item.title} loading="lazy" />
+                  <div className="cover-overlay"></div>
+                </div>
+              ) : (
+                <div className="card-cover placeholder">
+                  <div className="placeholder-content">
+                    <ImageIcon size={32} opacity={0.5} />
+                  </div>
+                  <div className="cover-overlay"></div>
+                </div>
+              )}
 
               <div className="card-content">
                 <div className="card-header">
                   <h3>{item.title}</h3>
                   <div className="ratings-container">
+                    {/* TMDB Rating */
+                  /* item.tmdbRating && ... (Movie/TV logic remains) */}
+                    {category !== 'game' && category !== 'book' && category !== 'music' && item.tmdbRating > 0 && (
+                      <span
+                        className="rating-badge tmdb-rating"
+                        title="TMDB Rating"
+                        style={{
+                          color: getRatingColor(item.tmdbRating),
+                          backgroundColor: `${getRatingColor(item.tmdbRating)}1a`,
+                          border: `1px solid ${getRatingColor(item.tmdbRating)}33`,
+                        }}
+                      >
+                        <span style={{ fontSize: '0.65rem', marginRight: '2px', opacity: 0.8 }}>TMDB</span> {Number(item.tmdbRating).toFixed(1)}
+                      </span>
+                    )}
+
+                    {/* Game Rating (RAWG) */}
+                    {category === 'game' && item.tmdbRating > 0 && (
+                      <span
+                        className="rating-badge game-rating"
+                        title="RAWG Rating"
+                        style={{
+                          color: getRatingColor(item.tmdbRating),
+                          backgroundColor: `${getRatingColor(item.tmdbRating)}1a`,
+                          border: `1px solid ${getRatingColor(item.tmdbRating)}33`,
+                        }}
+                      >
+                        <span style={{ fontSize: '0.65rem', marginRight: '2px', opacity: 0.8 }}>RAWG</span> {Number(item.tmdbRating).toFixed(1)}
+                      </span>
+                    )}
+
+                    {/* Book Community Rating (Open Library) */}
+                    {category === 'book' && item.tmdbRating > 0 && (
+                      <span
+                        className="rating-badge book-rating"
+                        title="Community Rating"
+                        style={{
+                          color: getRatingColor(item.tmdbRating),
+                          backgroundColor: `${getRatingColor(item.tmdbRating)}1a`,
+                          border: `1px solid ${getRatingColor(item.tmdbRating)}33`,
+                        }}
+                      >
+                        <span style={{ fontSize: '0.65rem', marginRight: '2px', opacity: 0.8 }}>OLib</span> {Number(item.tmdbRating).toFixed(1)}
+                      </span>
+                    )}
+
+                    {/* Letterboxd Rating (Manual) */}
                     {item.letterboxdRating && category === 'movie' && (
                       <span
                         className="rating-badge letterboxd-rating"
                         title="Letterboxd Rating"
+                        // ... styles ...
                         style={{
                           color: getRatingColor(item.letterboxdRating),
                           backgroundColor: `${getRatingColor(item.letterboxdRating)}${parseFloat(item.letterboxdRating) >= 3.8 ? '33' : '1a'}`,
@@ -287,9 +390,10 @@ const MediaList = ({ title, category }) => {
                           textShadow: parseFloat(item.letterboxdRating) >= 4.0 ? `0 0 5px ${getRatingColor(item.letterboxdRating)}` : 'none'
                         }}
                       >
-                        ★ {item.letterboxdRating}
+                        <span style={{ fontSize: '0.65rem', marginRight: '2px', opacity: 0.8 }}>Lbox</span> {item.letterboxdRating}
                       </span>
                     )}
+                    {/* Other ratings... */}
                     {item.personalRating && (item.status === 'completed' || item.status === 'dropped') && (
                       <span className="rating-badge personal-rating" title="My Rating">
                         👤 {item.personalRating}
@@ -316,7 +420,7 @@ const MediaList = ({ title, category }) => {
                 <div className="tags-row">
                   <div className="tags-left">
                     <span className={`status-pill status-${item.status}`}>{item.status}</span>
-                    {item.genre && category !== 'game' && (
+                    {item.genre && (
                       <span className="genre-tag">{item.genre}</span>
                     )}
                   </div>
@@ -345,57 +449,156 @@ const MediaList = ({ title, category }) => {
       />
 
       <style>{`
-        .flex-between {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .mb-8 { margin-bottom: 2rem; }
-        .empty-state {
-          padding: 4rem;
-          text-align: center;
-          color: var(--text-secondary);
-        }
-        .media-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-          gap: 1.5rem;
-        }
-        .media-card {
-          padding: 1.5rem;
-          transition: var(--transition-smooth);
-          cursor: pointer;
-          min-height: 160px;
-          display: flex;
-          flex-direction: column;
-          position: relative;
-        }
-        .media-card:hover {
-          transform: translateY(-4px);
-          border-color: var(--accent-primary);
-        }
-        
-        .status-completed-card {
-            opacity: 0.7;
-            filter: grayscale(0.2);
-        }
-        .status-dropped-card {
-            opacity: 0.5;
-            filter: grayscale(1);
-        }
-        .status-dropped-card h3 {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
-
-        .filters-bar {
-            display: flex;
-            gap: 1.5rem;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+            .flex-between {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .mb-8 { margin-bottom: 2rem; }
+            .empty-state {
+              padding: 4rem;
+              text-align: center;
+              color: var(--text-secondary);
+            }
+            .media-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Slightly narrower for poster look */
+              gap: 1.5rem;
+            }
+            .media-card {
+              transition: var(--transition-smooth);
+              cursor: pointer;
+              display: flex;
+              flex-direction: column;
+              position: relative;
+              overflow: hidden;
+              border: 1px solid rgba(255,255,255,0.05);
+              background: rgba(30, 30, 35, 0.6);
+            }
+            .media-card:hover {
+              transform: translateY(-4px);
+              border-color: var(--accent-primary);
+              box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            }
+            
+            .card-cover {
+                width: 100%;
+                aspect-ratio: ${category === 'music' ? '1/1' : '2/3'};
+                position: relative;
+                overflow: hidden;
+                background: #111;
+            }
+            .card-cover img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s ease;
+            }
+            .media-card:hover .card-cover img {
+                transform: scale(1.05);
+            }
+            
+            .card-content {
+              padding: 1rem;
+              flex-grow: 1;
+              display: flex;
+              flex-direction: column;
+            }
+    
+            .card-header {
+                display: flex;
+                flex-direction: column; /* Stack title and ratings */
+                gap: 0.25rem;
+                margin-bottom: 0.5rem;
+            }
+            .card-header h3 {
+                font-size: 1rem;
+                margin: 0;
+                line-height: 1.3;
+                font-weight: 600;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .item-meta {
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .tags-row {
+                margin-top: auto;
+                display: flex;
+                flex-direction: column; /* Stack tags for cleaner look on small cards */
+                gap: 0.5rem;
+            }
+            .tags-left {
+                display: flex;
+                gap: 0.4rem;
+                flex-wrap: wrap;
+            }
+            .date-added {
+                display: none; /* Hide date on grid card to save space */
+            }
+            .status-pill {
+              font-size: 0.7rem;
+              padding: 0.15rem 0.6rem;
+            }
+            .rating-badge {
+                font-size: 0.75rem;
+                padding: 0.1rem 0.3rem; 
+                align-self: flex-start;
+            }
+            .ratings-container {
+                display: flex;
+                gap: 0.4rem;
+                margin-top: 0.25rem;
+            }
+            
+            /* Delete Btn */
+             .delete-btn {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                opacity: 0;
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(4px);
+                color: #fca5a5;
+                padding: 0.4rem;
+                border-radius: 50%;
+                transition: all 0.2s ease;
+                z-index: 20;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            .media-card:hover .delete-btn {
+                opacity: 1;
+            }
+            .delete-btn:hover {
+                background: #ef4444;
+                color: white;
+            }
+            
+            /* Status filters CSS .. */
+            .status-completed-card {
+                opacity: 0.8;
+            }
+            .status-dropped-card {
+                opacity: 0.6;
+                filter: grayscale(1);
+            }
+    
+            .filters-bar {
+                display: flex;
+                gap: 1.5rem;
+                padding: 1rem;
+                margin-bottom: 2rem;
+                align-items: center;
+                flex-wrap: wrap;
+            }
         .filter-group {
             display: flex;
             flex-direction: column;

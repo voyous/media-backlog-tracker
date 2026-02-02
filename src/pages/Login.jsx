@@ -153,7 +153,7 @@ const Login = () => {
                 <div className="icon-wrapper">
                     <Sparkles size={48} className="text-gradient-icon" />
                 </div>
-                <h1 className="text-gradient">Unstack</h1>
+                <h1 className="text-gradient">Unstackd</h1>
                 <p className="subtitle">Track your games, movies, and shows across all your devices.</p>
 
                 {error && <div className="error-message">{error}</div>}

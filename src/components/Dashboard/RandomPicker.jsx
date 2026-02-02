@@ -35,7 +35,7 @@ const RandomPicker = () => {
         <div className="picker-section mb-8">
             <h2 className="flex-center section-header">
                 <Sparkles size={24} className="mr-2 text-warning" />
-                What Should I Play Next?
+                What to Unstack
             </h2>
 
             <div className="picker-grid">

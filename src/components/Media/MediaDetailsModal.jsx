@@ -46,14 +46,21 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
         if (!isEditing) {
             switch (item.category) {
                 case 'game':
-                    return (formData.status === 'backlog' || formData.status === 'in-progress') && formData.excitement ? (
-                        <div className="detail-item"><label>Excitement</label><span>🔥 {formData.excitement}/10</span></div>
-                    ) : null;
+                    return (
+                        <>
+                            {(formData.status === 'backlog' || formData.status === 'in-progress') && formData.excitement && (
+                                <div className="detail-item"><label>Excitement</label><span>🔥 {formData.excitement}/10</span></div>
+                            )}
+                            {formData.year && <div className="detail-item"><label>Release Year</label><span>{formData.year}</span></div>}
+                            {formData.tmdbRating > 0 && <div className="detail-item"><label>RAWG Rating</label><span>★ {formData.tmdbRating} / 5</span></div>}
+                        </>
+                    );
                 case 'movie':
                     return (
                         <>
                             {formData.director && <div className="detail-item"><label>Director</label><span>{formData.director}</span></div>}
                             {formData.year && <div className="detail-item"><label>Year</label><span>{formData.year}</span></div>}
+                            {formData.tmdbRating && <div className="detail-item"><label>TMDB</label><span>{formData.tmdbRating}</span></div>}
                             {formData.letterboxdRating && <div className="detail-item"><label>Letterboxd</label><span>{formData.letterboxdRating}</span></div>}
                         </>
                     );
@@ -61,13 +68,24 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
                     return (
                         <>
                             <div className="detail-item"><label>Tracking</label><span>{formData.seasonType === 'specific' ? `Season ${formData.seasonNumber}` : 'Entire Show'}</span></div>
-                            <div className="detail-item"><label>Length</label><span>{{ short: 'Mini Series', medium: 'Standard Season', long: 'Long Running' }[formData.showLength] || formData.showLength}</span></div>
                         </>
                     );
                 case 'book':
-                    return formData.author && <div className="detail-item"><label>Author</label><span>{formData.author}</span></div>;
+                    return (
+                        <>
+                            {formData.author && <div className="detail-item"><label>Author</label><span>{formData.author}</span></div>}
+                            {formData.year && <div className="detail-item"><label>Year</label><span>{formData.year}</span></div>}
+                            {formData.pages > 0 && <div className="detail-item"><label>Pages</label><span>{formData.pages}</span></div>}
+                            {formData.tmdbRating > 0 && <div className="detail-item"><label>Community Rating</label><span>★ {formData.tmdbRating}</span></div>}
+                        </>
+                    );
                 case 'music':
-                    return formData.artist && <div className="detail-item"><label>Artist</label><span>{formData.artist}</span></div>;
+                    return (
+                        <>
+                            {formData.artist && <div className="detail-item"><label>Artist</label><span>{formData.artist}</span></div>}
+                            {formData.year && <div className="detail-item"><label>Year</label><span>{formData.year}</span></div>}
+                        </>
+                    );
                 default:
                     return null;
             }
@@ -77,19 +95,31 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
         switch (item.category) {
             case 'game':
                 return (
-                    (formData.status === 'backlog' || formData.status === 'in-progress') && (
+
+                    <>
+                        {(formData.status === 'backlog' || formData.status === 'in-progress') && (
+                            <div className="form-group">
+                                <label>Hype / Excitement (0-10)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="10"
+                                    value={formData.excitement}
+                                    onChange={e => handleChange('excitement', e.target.value)}
+                                    className="input-field"
+                                />
+                            </div>
+                        )}
                         <div className="form-group">
-                            <label>Hype / Excitement (0-10)</label>
+                            <label>Year</label>
                             <input
                                 type="number"
-                                min="0"
-                                max="10"
-                                value={formData.excitement}
-                                onChange={e => handleChange('excitement', e.target.value)}
+                                value={formData.year}
+                                onChange={e => handleChange('year', e.target.value)}
                                 className="input-field"
                             />
                         </div>
-                    )
+                    </>
                 );
             case 'movie':
                 return (
@@ -136,16 +166,37 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
                 );
             case 'book':
                 return (
-                    <div className="form-group">
-                        <label>Author</label>
-                        <input value={formData.author} onChange={e => handleChange('author', e.target.value)} className="input-field" />
+                    <div className="edit-grid">
+                        <div className="form-group">
+                            <label>Author</label>
+                            <input value={formData.author} onChange={e => handleChange('author', e.target.value)} className="input-field" />
+                        </div>
+                        <div className="form-group">
+                            <label>Year</label>
+                            <input type="number" value={formData.year} onChange={e => handleChange('year', e.target.value)} className="input-field" />
+                        </div>
+                        <div className="form-group">
+                            <label>Pages</label>
+                            <input type="number" value={formData.pages} onChange={e => handleChange('pages', e.target.value)} className="input-field" />
+                        </div>
                     </div>
                 );
             case 'music':
                 return (
-                    <div className="form-group">
-                        <label>Artist</label>
-                        <input value={formData.artist} onChange={e => handleChange('artist', e.target.value)} className="input-field" />
+                    <div className="edit-grid">
+                        <div className="form-group">
+                            <label>Artist</label>
+                            <input value={formData.artist} onChange={e => handleChange('artist', e.target.value)} className="input-field" />
+                        </div>
+                        <div className="form-group">
+                            <label>Year</label>
+                            <input
+                                type="number"
+                                value={formData.year}
+                                onChange={e => handleChange('year', e.target.value)}
+                                className="input-field"
+                            />
+                        </div>
                     </div>
                 );
             default:
@@ -157,36 +208,55 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
         <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? 'Edit Item' : 'Item Details'}>
             <div className="details-container">
                 {/* Header Section */}
-                <div className="details-header">
-                    {isEditing ? (
-                        <div className="form-group full-width">
-                            <label>Title</label>
-                            <input
-                                value={formData.title}
-                                onChange={e => handleChange('title', e.target.value)}
-                                className="input-field title-input"
-                            />
+                <div className="details-header-row">
+                    {formData.coverUrl && !isEditing && (
+                        <div className="header-cover">
+                            <img src={formData.coverUrl} alt={formData.title} />
                         </div>
-                    ) : (
-                        <h2>{formData.title}</h2>
                     )}
 
-                    <div className="badges">
-                        <div className={`status-pill status-${formData.status} status-wrapper`}>
-                            {isEditing ? (
-                                <select
-                                    value={formData.status}
-                                    onChange={e => handleChange('status', e.target.value)}
-                                    className="status-select"
-                                >
-                                    <option value="backlog">Backlog</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="dropped">Dropped</option>
-                                </select>
-                            ) : formData.status}
+                    <div className="details-header-content">
+                        {isEditing ? (
+                            <>
+                                <div className="form-group full-width">
+                                    <label>Title</label>
+                                    <input
+                                        value={formData.title}
+                                        onChange={e => handleChange('title', e.target.value)}
+                                        className="input-field title-input"
+                                    />
+                                </div>
+                                <div className="form-group full-width">
+                                    <label>Cover Image URL</label>
+                                    <input
+                                        value={formData.coverUrl || ''}
+                                        onChange={e => handleChange('coverUrl', e.target.value)}
+                                        className="input-field"
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <h2>{formData.title}</h2>
+                        )}
+
+                        <div className="badges">
+                            <div className={`status-pill status-${formData.status} status-wrapper`}>
+                                {isEditing ? (
+                                    <select
+                                        value={formData.status}
+                                        onChange={e => handleChange('status', e.target.value)}
+                                        className="status-select"
+                                    >
+                                        <option value="backlog">Backlog</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="dropped">Dropped</option>
+                                    </select>
+                                ) : formData.status}
+                            </div>
+                            <span className="category-pill">{formData.category}</span>
                         </div>
-                        <span className="category-pill">{formData.category}</span>
                     </div>
                 </div>
 
@@ -286,12 +356,30 @@ const MediaDetailsModal = ({ isOpen, onClose, item }) => {
                     flex-direction: column;
                     gap: 1.5rem;
                 }
-                .details-header {
+                .details-header-row {
+                    display: flex;
+                    gap: 1.5rem;
+                }
+                .header-cover {
+                    width: 100px;
+                    flex-shrink: 0;
+                    border-radius: var(--radius-md);
+                    overflow: hidden;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                }
+                .header-cover img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+                .details-header-content {
+                    flex: 1;
                     display: flex;
                     flex-direction: column;
                     gap: 1rem;
                 }
-                .details-header h2 {
+                
+                .details-header-content h2 {
                     font-size: 1.5rem;
                     margin: 0;
                     background: var(--gradient-main);

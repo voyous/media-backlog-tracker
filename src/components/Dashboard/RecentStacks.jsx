@@ -32,7 +32,11 @@ const RecentItemsList = () => {
             onClick={() => setSelectedItem(item)}
         >
             <div className="row-content">
-                <span className={`category-dot ${item.category}`}></span>
+                {item.coverUrl ? (
+                    <img src={item.coverUrl} alt={item.title} className="row-thumb" />
+                ) : (
+                    <span className={`category-dot ${item.category}`}></span>
+                )}
                 <span className="row-title">{item.title}</span>
             </div>
             <span className="row-meta">
@@ -113,6 +117,14 @@ const RecentItemsList = () => {
                     height: 8px;
                     border-radius: 50%;
                     flex-shrink: 0;
+                }
+                .row-thumb {
+                    width: 24px;
+                    height: 32px;
+                    object-fit: cover;
+                    border-radius: 4px;
+                    flex-shrink: 0;
+                    background: #333;
                 }
                 .category-dot.game { background: #f472b6; }
                 .category-dot.movie { background: #22d3ee; }
