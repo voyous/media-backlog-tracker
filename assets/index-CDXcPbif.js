@@ -934,7 +934,7 @@ Please change the parent <Route path="${ne}"> to <Route path="${ne==="/"?"*":`${
             color: var(--text-primary);
             border-color: rgba(255, 255, 255, 0.1);
         }
-      `})]})},w4=()=>{const{loginWithRedirect:r,loginWithPopup:e,currentUser:n,error:s}=Qh(),o=Yp();z.useEffect(()=>{n&&o("/")},[n,o]);const u=async()=>{try{await r()}catch(m){console.error("Failed to log in",m)}},f=async()=>{try{await e()}catch(m){console.error("Failed to log in",m)}};return T.jsxs("div",{className:"login-container",children:[T.jsxs("div",{className:"login-card glass-panel",children:[T.jsx("div",{className:"icon-wrapper",children:T.jsx(r1,{size:48,className:"text-gradient-icon"})}),T.jsx("h1",{className:"text-gradient",children:"Media Tracker"}),T.jsx("p",{className:"subtitle",children:"Track your games, movies, and shows across all your devices."}),s&&T.jsx("div",{className:"error-message",children:s}),T.jsxs("div",{className:"button-group",children:[T.jsxs("button",{onClick:u,className:"google-btn",children:[T.jsx("img",{src:"https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg",alt:"Google logo"}),T.jsx("span",{children:"Sign in (Redirect)"})]}),T.jsxs("button",{onClick:f,className:"google-btn secondary",children:[T.jsx("img",{src:"https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg",alt:"Google logo"}),T.jsx("span",{children:"Sign in (Popup)"})]}),T.jsx("p",{className:"helper-text",children:"Try Popup if Redirect fails on your device."})]})]}),T.jsx("style",{children:`
+      `})]})},w4=()=>{const{login:r,currentUser:e,error:n}=Qh(),s=Yp();z.useEffect(()=>{e&&s("/")},[e,s]);const o=async()=>{try{await r()}catch(u){console.error("Failed to log in",u)}};return T.jsxs("div",{className:"login-container",children:[T.jsxs("div",{className:"login-card glass-panel",children:[T.jsx("div",{className:"icon-wrapper",children:T.jsx(r1,{size:48,className:"text-gradient-icon"})}),T.jsx("h1",{className:"text-gradient",children:"Media Tracker"}),T.jsx("p",{className:"subtitle",children:"Track your games, movies, and shows across all your devices."}),n&&T.jsx("div",{className:"error-message",children:n}),T.jsxs("button",{onClick:o,className:"google-btn",children:[T.jsx("img",{src:"https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg",alt:"Google logo"}),T.jsx("span",{children:"Sign in with Google"})]})]}),T.jsx("style",{children:`
                 .login-container {
                     height: 100vh;
                     display: flex;
@@ -964,6 +964,7 @@ Please change the parent <Route path="${ne}"> to <Route path="${ne==="/"?"*":`${
                     color: var(--text-secondary);
                     margin-bottom: 2.5rem;
                     font-size: 1.1rem;
+                }
                 .error-message {
                     background: rgba(239, 68, 68, 0.2);
                     color: #fca5a5;
@@ -972,11 +973,6 @@ Please change the parent <Route path="${ne}"> to <Route path="${ne==="/"?"*":`${
                     margin-bottom: 1.5rem;
                     font-size: 0.9rem;
                     border: 1px solid rgba(239, 68, 68, 0.3);
-                }
-                .button-group {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
                 }
                 .google-btn {
                     display: flex;
@@ -994,10 +990,6 @@ Please change the parent <Route path="${ne}"> to <Route path="${ne==="/"?"*":`${
                     cursor: pointer;
                     border: none;
                 }
-                .google-btn.secondary {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: white;
-                }
                 .google-btn:hover {
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
@@ -1005,10 +997,5 @@ Please change the parent <Route path="${ne}"> to <Route path="${ne==="/"?"*":`${
                 .google-btn img {
                     width: 24px;
                     height: 24px;
-                }
-                .helper-text {
-                    font-size: 0.8rem;
-                    color: var(--text-secondary);
-                    margin-top: 0.5rem;
                 }
             `})]})},Qa=({children:r})=>{const{currentUser:e}=Qh();return e?r:T.jsx(Yb,{to:"/login"})};function R4(){return T.jsx(DD,{children:T.jsxs(oD,{children:[T.jsx(Wi,{path:"/login",element:T.jsx(w4,{})}),T.jsx(Wi,{path:"/",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(b4,{})})})}),T.jsx(Wi,{path:"/games",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(Vl,{title:"Games",category:"game"})})})}),T.jsx(Wi,{path:"/movies",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(Vl,{title:"Movies",category:"movie"})})})}),T.jsx(Wi,{path:"/tv",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(Vl,{title:"TV Shows",category:"tv"})})})}),T.jsx(Wi,{path:"/books",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(Vl,{title:"Books",category:"book"})})})}),T.jsx(Wi,{path:"/music",element:T.jsx(Qa,{children:T.jsx(Ya,{children:T.jsx(Vl,{title:"Music",category:"music"})})})}),T.jsx(Wi,{path:"*",element:T.jsx(Yb,{to:"/",replace:!0})})]})})}YS.createRoot(document.getElementById("root")).render(T.jsx(z.StrictMode,{children:T.jsx(uN,{children:T.jsx(cN,{children:T.jsx(R4,{})})})}));
