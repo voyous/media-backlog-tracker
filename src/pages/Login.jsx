@@ -1,18 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Login = () => {
-    const { login } = useAuth();
+    const { login, currentUser } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (currentUser) {
+            navigate('/');
+        }
+    }, [currentUser, navigate]);
 
     const handleLogin = async () => {
         try {
             await login();
-            navigate('/');
         } catch (error) {
             console.error("Failed to log in", error);
-            alert("Failed to log in: " + error.message);
         }
     };
 
